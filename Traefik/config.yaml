@@ -1,0 +1,112 @@
+http:
+  middlewares:
+  # The following pihole middlewares were a test which didn't work completely, but maybe you can fix it!
+    # addprefix-pihole:
+    #   addPrefix:
+    #     prefix: "/admin"
+    # redirectregex-pihole:
+    #   redirectRegex:
+    #     regex: "/admin/(.*)"
+    #     replacement: /
+    default-security-headers:
+      headers:
+        customBrowserXSSValue: 0                          # X-XSS-Protection=1; mode=block
+        contentTypeNosniff: true                          # X-Content-Type-Options=nosniff
+        forceSTSHeader: true                              # Add the Strict-Transport-Security header even when the connection is HTTP
+        frameDeny: false                                  # X-Frame-Options=deny
+        referrerPolicy: "strict-origin-when-cross-origin"
+        stsIncludeSubdomains: true                        # Add includeSubdomains to the Strict-Transport-Security header
+        stsPreload: true                                  # Add preload flag appended to the Strict-Transport-Security header
+        stsSeconds: 3153600                               # Set the max-age of the Strict-Transport-Security header (63072000 = 2 years)
+        #contentSecurityPolicy: "default-src 'self'"
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+    https-redirectscheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    default-whitelist:
+      ipAllowList:
+        sourceRange:
+        - "10.0.0.0/8"
+        - "192.168.0.0/16"
+        - "172.16.0.0/12"
+        - "172.18.0.0/16"
+    secured:
+      chain:
+        middlewares:
+        - default-whitelist
+        - default-headers
+
+  # For each service, you must fill out the following rtr parameters and also fill out it's corresponding svc parameters
+  # If the service is unreachable, there are a couple steps in the stack which must be verified like making sure the 
+  # DNS entry is made, checking if the entry point is correct, checking for spelling, etc.
+  # These are a few examples of some services you may run in your config file
+
+  routers:
+    portainer-rtr:
+      entryPoints:
+        - "https"
+      rule: "Host(`portainer.princessdonut.carl`)"
+      middlewares:
+        - default-security-headers
+        - https-redirectscheme
+      tls: {}
+      service: portainer-svc
+
+    proxmox-rtr:
+      entryPoints:
+        - "https"
+      rule: "Host(`proxmox.princessdonut.carl`)"
+      middlewares:
+        - default-security-headers
+        - https-redirectscheme
+      tls: {}
+      service: proxmox-svc
+
+    networkinator-rtr:
+      entryPoints:
+        - "https"
+      rule: "Host(`networkinator.princessdonut.carl`)"
+      middlewares:
+        - default-security-headers
+        - https-redirectscheme
+      tls: {}
+      service: networkinator-svc
+
+    pihole-rtr:
+      entryPoints:
+        - "https"
+      rule: "Host(`pihole.princessdonut.carl`)"
+      middlewares:
+        # - redirectregex-pihole
+        - default-security-headers
+        # - addprefix-pihole
+        - https-redirectscheme
+      tls: {}
+      service: pihole-svc
+
+  services:
+    dockermedia-svc:
+      loadBalancer:
+        servers:
+          - url: "https://10.10.10.10:9443"
+        passHostHeader: true
+
+    proxmox-svc:
+      loadBalancer:
+        servers:
+          - url: "https://10.20.20.20:8006"
+        passHostHeader: true
+
+    networkinator-svc:
+      loadBalancer:
+        servers:
+          - url: "https://10.30.30.30:8006"
+        passHostHeader: true
+
+    pihole-svc:
+      loadBalancer:
+        servers:
+          - url: "https://10.40.40.40:443"
+        passHostHeader: true

@@ -1,0 +1,28 @@
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=CST
+      # These next few are specific for an Intel GPU for transcoding.
+      # Uncomment below for Intel GPU transcoding
+      # - DOCKER_MODS=linuxserver/mods:universal-package-install
+      # - INSTALL_PACKAGES=intel-opencl-icd|libze-intel-gpu1|libze1
+    volumes:
+      - /path/to/config:/config
+      - /network/path/to/Movies:/data/Movies
+      - /network/path/to/TV:/data/TV
+    # These are also needed for GPU transcoding
+    # group_add:
+    #   - "109" # Required group for render
+    #   - "44" # Required group for video
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+    devices:
+      # This is what my GPU shows up as in dev/dri
+      # This may vary for you if you have a multiple 
+      # GPU system
+      - /dev/dri/renderD128:/dev/dri/renderD128

@@ -1,0 +1,39 @@
+api:
+  dashboard: true
+  debug: true
+entryPoints:
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entrypoint:
+          to: https
+          scheme: https
+  https:
+    address: ":443"
+serversTransport:
+  insecureSkipVerify: true
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+  file:
+    filename: /config.yaml
+certificatesResolvers:
+  cloudflare:
+    acme:
+      caServer: https://acme-v02.api.letsencrypt.org/directory # This is the Production caServer. Use this if you're confident things are working.
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory # This is the Staging caServer. Use this if you're still testing things.
+      email: princess.donut@princessdonut.carl # Cloudflare email (or other provider)
+      storage: acme.json
+      dnsChallenge:
+        provider: cloudflare # Change this depending on your provider. 
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
+
+log:
+  level: "DEBUG"
+  filePath: "/var/log/traefik/traefik.log"
+accessLog:
+  filePath: "/var/log/traefik/access.log"

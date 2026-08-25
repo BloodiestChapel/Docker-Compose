@@ -17,3 +17,7 @@ The types of services that will land here involve reverse proxies, monitoring, e
 **Volumes/paths:** Placeholder paths (e.g. `/path/to/data`) that need substitution before use.
 
 **Image tagging:** `:latest` unless otherwise noted in the file.
+
+## Credit
+
+Credit where credit is due, a lot of what I have learned and a lot of these files come from [Jim's Garage](https://www.youtube.com/@Jims-Garage). I highly suggest visiting his channel as he is a wealth of knowledge and I wouldn't enjoy this nerdy hobby as much as I do without his videos.
